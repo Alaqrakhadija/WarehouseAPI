@@ -31,9 +31,9 @@ namespace Warehouse.API.Controllers
             _locationRepository = locationRepository;
         }
 
-        // GET: api/packages?filtter=outgoing
-        // GET: api/packages?filtter=cuurent
-        [HttpGet]
+        // GET: api/packages/byState?filtter=outgoing
+        // GET: api/packages/byState?filtter=cuurent
+        [HttpGet("byState")]
         public async Task<ActionResult<IEnumerable<PackageDto>>> 
             GetPackagesByFilter([FromQuery] string filter)
         {
@@ -41,7 +41,7 @@ namespace Warehouse.API.Controllers
             var Packages = await _packageRepository.GetPackagesByFilterAsync(filter);
             return Ok(_mapper.Map <IEnumerable<PackageDto>> (Packages));
         }
-        // GET: api/packages?start= & end=
+        // GET: api/packages/byDateRange?start= & end=
         [HttpGet("byDateRange")]
         public async Task<ActionResult<IEnumerable<PackageForGroupingDto>>>
             GetPackagesByPeriod([FromQuery]DateTime start , [FromQuery] DateTime end)
@@ -50,14 +50,21 @@ namespace Warehouse.API.Controllers
             var PackagesByCustomer = await _packageRepository.GetPackagesByPeriodAsync(start,end);
             return Ok(_mapper.Map<IEnumerable<PackageForGroupingDto>>(PackagesByCustomer));
         }
+        // GET: api/packages
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<PackageForGroupingDto>>>
+            GetPackagesGroupByCustomer()
+        {
+
+            var PackagesByCustomer = await _packageRepository.GetPackagesGroupByCustomerAsync();
+            return Ok(_mapper.Map<IEnumerable<PackageForGroupingDto>>(PackagesByCustomer));
+        }
 
         // POST: api/Packages
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<IActionResult> AddPackage(PackageForCreationDto package)
         {
-            _logger.LogInformation("date:" + package.ExpectedInDate.Date);
-            _logger.LogInformation("date2:" + package.ExpectedInDate);
             var location = await _locationRepository
                           .GetFreeLocationForSpecificPeriodAsync(package.ExpectedInDate,
                           package.ExpectedOutDate, package.Dimensions);
@@ -104,9 +111,11 @@ namespace Warehouse.API.Controllers
                 return NotFound();
             }
 
-            
+            var packageToUpadte = await _packageRepository.GetPackageAsync(id);
+            packageToUpadte.Type = package.Type;
+            packageToUpadte.SpecialInstructions = package.SpecialInstructions;
 
-          await _packageRepository.UpdatePackageAsync(id, package);
+            await _packageRepository.UpdatePackageAsync(packageToUpadte);
 
             return NoContent();
         }

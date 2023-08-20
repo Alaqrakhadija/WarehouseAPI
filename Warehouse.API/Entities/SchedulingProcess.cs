@@ -15,6 +15,7 @@ namespace Warehouse.API.Entities
         public DateTime? ActualInDate { get; set; }
         public DateTime? ActualOutDate { get; set; }
         public int PackageId { get; set; }
+        public Package  Package { get; set; }
         public int LocationId { get; set; }
 
     }

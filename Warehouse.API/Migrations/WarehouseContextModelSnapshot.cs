@@ -36,7 +36,7 @@ namespace Warehouse.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Containers");
+                    b.ToTable("Containers", (string)null);
 
                     b.HasData(
                         new
@@ -69,7 +69,7 @@ namespace Warehouse.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Locations");
+                    b.ToTable("Locations", (string)null);
 
                     b.HasData(
                         new
@@ -135,7 +135,7 @@ namespace Warehouse.API.Migrations
 
                     b.HasIndex("LocationId");
 
-                    b.ToTable("Packages");
+                    b.ToTable("Packages", (string)null);
 
                     b.HasData(
                         new
@@ -236,7 +236,7 @@ namespace Warehouse.API.Migrations
                     b.HasIndex("PackageId")
                         .IsUnique();
 
-                    b.ToTable("SchedulingProcess");
+                    b.ToTable("SchedulingProcess", (string)null);
 
                     b.HasData(
                         new
@@ -317,7 +317,7 @@ namespace Warehouse.API.Migrations
 
                     b.HasIndex("SupplierId");
 
-                    b.ToTable("SupplierContainer");
+                    b.ToTable("SupplierContainer", (string)null);
 
                     b.HasData(
                         new
@@ -361,7 +361,7 @@ namespace Warehouse.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("User");
+                    b.ToTable("User", (string)null);
 
                     b.UseTptMappingStrategy();
                 });
@@ -370,7 +370,7 @@ namespace Warehouse.API.Migrations
                 {
                     b.HasBaseType("Warehouse.API.Entities.User");
 
-                    b.ToTable("Customer");
+                    b.ToTable("Customer", (string)null);
 
                     b.HasData(
                         new
@@ -394,7 +394,7 @@ namespace Warehouse.API.Migrations
                 {
                     b.HasBaseType("Warehouse.API.Entities.User");
 
-                    b.ToTable("Supplier");
+                    b.ToTable("Supplier", (string)null);
 
                     b.HasData(
                         new

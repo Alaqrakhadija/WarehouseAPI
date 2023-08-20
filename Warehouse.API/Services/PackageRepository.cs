@@ -50,6 +50,11 @@ namespace Warehouse.API.Services
             ).Select(s=>s.PackageId).Contains(p.Id)).Include(p => p.SchedulingProcess).GroupBy(p => p.Customer).ToListAsync();
 
         }
+        public async Task<IEnumerable<IGrouping<Customer, Package>>> GetPackagesGroupByCustomerAsync()
+        {
+            return await _context.Packages.Include(p => p.SchedulingProcess).GroupBy(p => p.Customer).ToListAsync();
+
+        }
         public async Task DeletePackagesAsync()
         {
             var packages =await _context.Packages.Where(
@@ -68,12 +73,10 @@ namespace Warehouse.API.Services
             await _context.SaveChangesAsync();
 
         }
-        public async Task UpdatePackageAsync(int id,PackageForUpdateDto package)
+        public async Task UpdatePackageAsync(Package package)
         {
-            var packageToUpadte = await GetPackageAsync(id);
-            packageToUpadte.Type = package.Type;
-            packageToUpadte.SpecialInstructions = package.SpecialInstructions;
-            _context.Entry(packageToUpadte).State = EntityState.Modified;
+
+            _context.Entry(package).State = EntityState.Modified;
             await _context.SaveChangesAsync();
 
         }

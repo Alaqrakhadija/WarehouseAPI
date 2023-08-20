@@ -6,6 +6,7 @@ namespace Warehouse.API.Profiles
     {
         public LocationProfile() {
             CreateMap<Entities.Location, Models.LocationDto>();
+            CreateMap<Models.LocationForCreateUpdateDto, Entities.Location>();
         }
 
     }

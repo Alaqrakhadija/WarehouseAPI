@@ -1,9 +1,5 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Tokens;
-using System.Reflection.Metadata;
 using Warehouse.API.DbContexts;
 using Warehouse.API.Entities;
 
@@ -46,6 +42,38 @@ namespace Warehouse.API.Services
 
 
 
+        }
+        public bool ValidDimension(int id,int  dimension)
+        {
+            return !_context.Locations.Include(l=>l.Schedulings).ThenInclude(s=>s.Package)
+                .SingleOrDefault(l=>l.Id==id).Schedulings.Any(s => s.Package.Dimensions>dimension && s.ActualOutDate == null);
+        
+        
+        }
+        public async Task<IEnumerable<Entities.Location>> GetLocationsAsync()
+        {
+            return await _context.Locations
+                .ToListAsync();
+        }
+        public async Task<Entities.Location> GetLocationAsync(int id)
+        {
+            return await _context.Locations
+                .SingleOrDefaultAsync(l => l.Id == id);
+        }
+        public async Task AddLocationAsync(Entities.Location Location)
+        {
+            _context.Locations
+                 .Add(Location);
+            await _context.SaveChangesAsync();
+        }
+        public async Task UpdateLocationAsync(Entities.Location Location)
+        {
+            _context.Entry(Location).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+        }
+        public bool LocationExists(int id)
+        {
+            return (_context.Locations?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }
