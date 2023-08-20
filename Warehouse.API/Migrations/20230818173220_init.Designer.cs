@@ -12,7 +12,7 @@ using Warehouse.API.DbContexts;
 namespace Warehouse.API.Migrations
 {
     [DbContext(typeof(WarehouseContext))]
-    [Migration("20230817123752_init")]
+    [Migration("20230818173220_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -132,6 +132,8 @@ namespace Warehouse.API.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ContainerId");
+
                     b.HasIndex("CustomerId");
 
                     b.HasIndex("LocationId");
@@ -243,64 +245,64 @@ namespace Warehouse.API.Migrations
                         new
                         {
                             Id = 1,
-                            ActualInDate = new DateTime(2023, 8, 17, 15, 37, 52, 743, DateTimeKind.Local).AddTicks(6928),
-                            ExpectedInDate = new DateTime(2023, 8, 17, 15, 37, 52, 743, DateTimeKind.Local).AddTicks(6895),
-                            ExpectedOutDate = new DateTime(2023, 8, 20, 15, 37, 52, 743, DateTimeKind.Local).AddTicks(6926),
+                            ActualInDate = new DateTime(2023, 8, 18, 20, 32, 20, 315, DateTimeKind.Local).AddTicks(8032),
+                            ExpectedInDate = new DateTime(2023, 8, 18, 20, 32, 20, 315, DateTimeKind.Local).AddTicks(7995),
+                            ExpectedOutDate = new DateTime(2023, 8, 21, 20, 32, 20, 315, DateTimeKind.Local).AddTicks(8028),
                             LocationId = 1,
                             PackageId = 1
                         },
                         new
                         {
                             Id = 2,
-                            ExpectedInDate = new DateTime(2023, 8, 20, 15, 37, 52, 743, DateTimeKind.Local).AddTicks(6932),
-                            ExpectedOutDate = new DateTime(2023, 8, 22, 15, 37, 52, 743, DateTimeKind.Local).AddTicks(6934),
+                            ExpectedInDate = new DateTime(2023, 8, 21, 20, 32, 20, 315, DateTimeKind.Local).AddTicks(8037),
+                            ExpectedOutDate = new DateTime(2023, 8, 23, 20, 32, 20, 315, DateTimeKind.Local).AddTicks(8039),
                             LocationId = 4,
                             PackageId = 4
                         },
                         new
                         {
                             Id = 3,
-                            ActualInDate = new DateTime(2023, 8, 15, 15, 37, 52, 743, DateTimeKind.Local).AddTicks(6939),
-                            ExpectedInDate = new DateTime(2023, 8, 14, 15, 37, 52, 743, DateTimeKind.Local).AddTicks(6936),
-                            ExpectedOutDate = new DateTime(2023, 8, 19, 15, 37, 52, 743, DateTimeKind.Local).AddTicks(6937),
+                            ActualInDate = new DateTime(2023, 8, 16, 20, 32, 20, 315, DateTimeKind.Local).AddTicks(8044),
+                            ExpectedInDate = new DateTime(2023, 8, 15, 20, 32, 20, 315, DateTimeKind.Local).AddTicks(8041),
+                            ExpectedOutDate = new DateTime(2023, 8, 20, 20, 32, 20, 315, DateTimeKind.Local).AddTicks(8043),
                             LocationId = 2,
                             PackageId = 2
                         },
                         new
                         {
                             Id = 4,
-                            ExpectedInDate = new DateTime(2023, 8, 11, 15, 37, 52, 743, DateTimeKind.Local).AddTicks(6941),
-                            ExpectedOutDate = new DateTime(2023, 8, 16, 15, 37, 52, 743, DateTimeKind.Local).AddTicks(6942),
+                            ExpectedInDate = new DateTime(2023, 8, 12, 20, 32, 20, 315, DateTimeKind.Local).AddTicks(8051),
+                            ExpectedOutDate = new DateTime(2023, 8, 17, 20, 32, 20, 315, DateTimeKind.Local).AddTicks(8053),
                             LocationId = 3,
                             PackageId = 3
                         },
                         new
                         {
                             Id = 5,
-                            ActualInDate = new DateTime(2023, 8, 13, 15, 37, 52, 743, DateTimeKind.Local).AddTicks(6947),
-                            ActualOutDate = new DateTime(2023, 8, 16, 15, 37, 52, 743, DateTimeKind.Local).AddTicks(6948),
-                            ExpectedInDate = new DateTime(2023, 8, 13, 15, 37, 52, 743, DateTimeKind.Local).AddTicks(6944),
-                            ExpectedOutDate = new DateTime(2023, 8, 16, 15, 37, 52, 743, DateTimeKind.Local).AddTicks(6945),
+                            ActualInDate = new DateTime(2023, 8, 14, 20, 32, 20, 315, DateTimeKind.Local).AddTicks(8059),
+                            ActualOutDate = new DateTime(2023, 8, 17, 20, 32, 20, 315, DateTimeKind.Local).AddTicks(8060),
+                            ExpectedInDate = new DateTime(2023, 8, 14, 20, 32, 20, 315, DateTimeKind.Local).AddTicks(8055),
+                            ExpectedOutDate = new DateTime(2023, 8, 17, 20, 32, 20, 315, DateTimeKind.Local).AddTicks(8057),
                             LocationId = 1,
                             PackageId = 5
                         },
                         new
                         {
                             Id = 6,
-                            ActualInDate = new DateTime(2023, 8, 12, 15, 37, 52, 743, DateTimeKind.Local).AddTicks(6953),
-                            ActualOutDate = new DateTime(2023, 8, 14, 15, 37, 52, 743, DateTimeKind.Local).AddTicks(6954),
-                            ExpectedInDate = new DateTime(2023, 8, 11, 15, 37, 52, 743, DateTimeKind.Local).AddTicks(6950),
-                            ExpectedOutDate = new DateTime(2023, 8, 14, 15, 37, 52, 743, DateTimeKind.Local).AddTicks(6952),
+                            ActualInDate = new DateTime(2023, 8, 13, 20, 32, 20, 315, DateTimeKind.Local).AddTicks(8067),
+                            ActualOutDate = new DateTime(2023, 8, 15, 20, 32, 20, 315, DateTimeKind.Local).AddTicks(8069),
+                            ExpectedInDate = new DateTime(2023, 8, 12, 20, 32, 20, 315, DateTimeKind.Local).AddTicks(8063),
+                            ExpectedOutDate = new DateTime(2023, 8, 15, 20, 32, 20, 315, DateTimeKind.Local).AddTicks(8065),
                             LocationId = 5,
                             PackageId = 6
                         },
                         new
                         {
                             Id = 7,
-                            ActualInDate = new DateTime(2023, 8, 15, 15, 37, 52, 743, DateTimeKind.Local).AddTicks(6959),
-                            ActualOutDate = new DateTime(2023, 8, 16, 15, 37, 52, 743, DateTimeKind.Local).AddTicks(6960),
-                            ExpectedInDate = new DateTime(2023, 8, 14, 15, 37, 52, 743, DateTimeKind.Local).AddTicks(6956),
-                            ExpectedOutDate = new DateTime(2023, 8, 16, 15, 37, 52, 743, DateTimeKind.Local).AddTicks(6957),
+                            ActualInDate = new DateTime(2023, 8, 16, 20, 32, 20, 315, DateTimeKind.Local).AddTicks(8075),
+                            ActualOutDate = new DateTime(2023, 8, 17, 20, 32, 20, 315, DateTimeKind.Local).AddTicks(8077),
+                            ExpectedInDate = new DateTime(2023, 8, 15, 20, 32, 20, 315, DateTimeKind.Local).AddTicks(8071),
+                            ExpectedOutDate = new DateTime(2023, 8, 17, 20, 32, 20, 315, DateTimeKind.Local).AddTicks(8072),
                             LocationId = 5,
                             PackageId = 7
                         });
@@ -417,7 +419,13 @@ namespace Warehouse.API.Migrations
 
             modelBuilder.Entity("Warehouse.API.Entities.Package", b =>
                 {
-                    b.HasOne("Warehouse.API.Entities.Customer", null)
+                    b.HasOne("Warehouse.API.Entities.Container", "Container")
+                        .WithMany()
+                        .HasForeignKey("ContainerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Warehouse.API.Entities.Customer", "Customer")
                         .WithMany("Packages")
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -426,6 +434,10 @@ namespace Warehouse.API.Migrations
                     b.HasOne("Warehouse.API.Entities.Location", null)
                         .WithMany("Packages")
                         .HasForeignKey("LocationId");
+
+                    b.Navigation("Container");
+
+                    b.Navigation("Customer");
                 });
 
             modelBuilder.Entity("Warehouse.API.Entities.SchedulingProcess", b =>

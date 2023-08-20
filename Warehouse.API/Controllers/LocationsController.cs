@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Warehouse.API.DbContexts;
 using Warehouse.API.Entities;
+using Warehouse.API.Models;
 using Warehouse.API.Services;
 
 namespace Warehouse.API.Controllers
@@ -16,21 +18,22 @@ namespace Warehouse.API.Controllers
     public class LocationsController : ControllerBase
     {
         private readonly LocationRepository _locationRepository;
- 
+        private readonly IMapper _mapper;
 
-        public LocationsController( LocationRepository locationRepository)
+        public LocationsController( LocationRepository locationRepository, IMapper mapper)
         {
-
+            _mapper = mapper;
             _locationRepository = locationRepository;
     
         }
 
         // GET: api/Locations
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Location>>> GetFreeLocations(DateTime filter)
+        public async Task<ActionResult<IEnumerable<LocationDto>>> GetFreeLocations(DateTime filter)
         {
+            var freeLocations = await _locationRepository.GetFreeLocationsByDateAsync(filter);
 
-            return Ok(await _locationRepository.GetFreeLocationsByDateAsync(filter));
+            return Ok(_mapper.Map<IEnumerable<LocationDto>>(freeLocations));
         }
 
         //// GET: api/Locations/5

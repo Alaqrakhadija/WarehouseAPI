@@ -16,10 +16,10 @@ namespace Warehouse.API.Entities
         public string SpecialInstructions { get; set; }=string.Empty;
 
         public int ContainerId { get; set; }
-        //public Container Container { get; set; }
+        public Container Container { get; set; }
 
         public int CustomerId { get; set; }
-        //public Customer Customer { get; set; }
+        public Customer Customer { get; set; }
         public SchedulingProcess SchedulingProcess { get; set; }
 
 

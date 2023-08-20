@@ -2,10 +2,14 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 using Warehouse.API.DbContexts;
 using Warehouse.API.Entities;
 using Warehouse.API.Models;
 using Warehouse.API.Services;
+using Microsoft.CodeAnalysis;
+using System.Reflection.Metadata.Ecma335;
 
 namespace Warehouse.API.Controllers
 {
@@ -14,116 +18,121 @@ namespace Warehouse.API.Controllers
     public class PackagesController : ControllerBase
     {
 
-        private readonly PackageRepository _PackageRepository;
+        private readonly PackageRepository _packageRepository;
+        private readonly LocationRepository _locationRepository;
         private readonly ILogger<PackagesController> _logger;
         private readonly IMapper _mapper;
         public PackagesController( PackageRepository packageRepository,
-            ILogger<PackagesController> logger, IMapper mapper)
+            ILogger<PackagesController> logger, IMapper mapper, LocationRepository locationRepository)
         {
-            _PackageRepository = packageRepository;
+            _packageRepository = packageRepository;
             _logger = logger;
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            _locationRepository = locationRepository;
         }
 
-        // GET: api/packages
+        // GET: api/packages?filtter=outgoing
+        // GET: api/packages?filtter=cuurent
         [HttpGet]
         public async Task<ActionResult<IEnumerable<PackageDto>>> 
-            GetOutGoingOrCurrentPackages(string filter)
+            GetPackagesByFilter([FromQuery] string filter)
         {
-            _logger.LogInformation("filter:" + filter);
-            var Packages = await _PackageRepository.GetPackagesByFilterAsync(filter);
+
+            var Packages = await _packageRepository.GetPackagesByFilterAsync(filter);
             return Ok(_mapper.Map <IEnumerable<PackageDto>> (Packages));
         }
-       
+        // GET: api/packages?start= & end=
+        [HttpGet("byDateRange")]
+        public async Task<ActionResult<IEnumerable<PackageForGroupingDto>>>
+            GetPackagesByPeriod([FromQuery]DateTime start , [FromQuery] DateTime end)
+        {
+
+            var PackagesByCustomer = await _packageRepository.GetPackagesByPeriodAsync(start,end);
+            return Ok(_mapper.Map<IEnumerable<PackageForGroupingDto>>(PackagesByCustomer));
+        }
+
+        // POST: api/Packages
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPost]
+        public async Task<IActionResult> AddPackage(PackageForCreationDto package)
+        {
+            _logger.LogInformation("date:" + package.ExpectedInDate.Date);
+            _logger.LogInformation("date2:" + package.ExpectedInDate);
+            var location = await _locationRepository
+                          .GetFreeLocationForSpecificPeriodAsync(package.ExpectedInDate,
+                          package.ExpectedOutDate, package.Dimensions);
+            if(location==null)
+             return NotFound("there are no locations available"); 
+            var packageToStore = createPackage(package,location.Id);
+ await _packageRepository.AddPackageAsync(packageToStore);
+            //return  Ok(_mapper.Map<PackageDto>(packageToStore));
+            return CreatedAtAction("GetPackage", new { id = packageToStore.Id }
+            , Ok(_mapper.Map<PackageDto>(packageToStore)));
+        }
+
+        // DELETE: api/packages
+        [HttpDelete]
+        public async Task<IActionResult> DeleteUnArrivedPackages()
+        {
+ await _packageRepository.DeletePackagesAsync();
+
+            return NoContent();
+        }
 
 
-        //// GET: api/Packages/5
-        //[HttpGet("{id}")]
-        //public async Task<ActionResult<Package>> GetPackage(int id)
-        //{
-        //  if (_context.Packages == null)
-        //  {
-        //      return NotFound();
-        //  }
-        //    var package = await _context.Packages.FindAsync(id);
+        // GET: api/Packages/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<PackageDto>> GetPackage(int id)
+        {
 
-        //    if (package == null)
-        //    {
-        //        return NotFound();
-        //    }
+            var package = await _packageRepository.GetPackageAsync(id);
 
-        //    return package;
-        //}
+            if (package == null)
+            {
+                return NotFound();
+            }
 
-        //// PUT: api/Packages/5
-        //// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        //[HttpPut("{id}")]
-        //public async Task<IActionResult> PutPackage(int id, Package package)
-        //{
-        //    if (id != package.Id)
-        //    {
-        //        return BadRequest();
-        //    }
+            return Ok(_mapper.Map< PackageDto >( package));
+        }
+        // PUT: api/Packages/5
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutPackage(int id, PackageForUpdateDto package)
+        {
+            if (!_packageRepository.PackageExists(id))
+            {
+                return NotFound();
+            }
 
-        //    _context.Entry(package).State = EntityState.Modified;
+            
 
-        //    try
-        //    {
-        //        await _context.SaveChangesAsync();
-        //    }
-        //    catch (DbUpdateConcurrencyException)
-        //    {
-        //        if (!PackageExists(id))
-        //        {
-        //            return NotFound();
-        //        }
-        //        else
-        //        {
-        //            throw;
-        //        }
-        //    }
+          await _packageRepository.UpdatePackageAsync(id, package);
 
-        //    return NoContent();
-        //}
+            return NoContent();
+        }
+        public Package createPackage(PackageForCreationDto package, int locationId)
+        {
+            return new Package
+            {
+                CustomerId = package.CustomerId,
+                ContainerId = package.ContainerId,
+                Dimensions = package.Dimensions,
+                SpecialInstructions = package.SpecialInstructions,
+                Type = package.Type,
+                SchedulingProcess = new SchedulingProcess
+                {
+                    ExpectedInDate = package.ExpectedInDate,
+                    ExpectedOutDate = package.ExpectedOutDate,
+                    LocationId = locationId,
+                }
+            };
+        }
 
-        //// POST: api/Packages
-        //// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        //[HttpPost]
-        //public async Task<ActionResult<Package>> PostPackage(Package package)
-        //{
-        //  if (_context.Packages == null)
-        //  {
-        //      return Problem("Entity set 'WarehouseContext.Packages'  is null.");
-        //  }
-        //    _context.Packages.Add(package);
-        //    await _context.SaveChangesAsync();
 
-        //    return CreatedAtAction("GetPackage", new { id = package.Id }, package);
-        //}
 
-        //// DELETE: api/Packages/5
-        //[HttpDelete("{id}")]
-        //public async Task<IActionResult> DeletePackage(int id)
-        //{
-        //    if (_context.Packages == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    var package = await _context.Packages.FindAsync(id);
-        //    if (package == null)
-        //    {
-        //        return NotFound();
-        //    }
 
-        //    _context.Packages.Remove(package);
-        //    await _context.SaveChangesAsync();
 
-        //    return NoContent();
-        //}
 
-        //private bool PackageExists(int id)
-        //{
-        //    return (_context.Packages?.Any(e => e.Id == id)).GetValueOrDefault();
-        //}
+
     }
 }

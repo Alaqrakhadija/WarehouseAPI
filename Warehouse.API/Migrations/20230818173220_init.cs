@@ -103,6 +103,12 @@ namespace Warehouse.API.Migrations
                 {
                     table.PrimaryKey("PK_Packages", x => x.Id);
                     table.ForeignKey(
+                        name: "FK_Packages_Containers_ContainerId",
+                        column: x => x.ContainerId,
+                        principalTable: "Containers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
                         name: "FK_Packages_Customer_CustomerId",
                         column: x => x.CustomerId,
                         principalTable: "Customer",
@@ -255,14 +261,19 @@ namespace Warehouse.API.Migrations
                 columns: new[] { "Id", "ActualInDate", "ActualOutDate", "ExpectedInDate", "ExpectedOutDate", "LocationId", "PackageId" },
                 values: new object[,]
                 {
-                    { 1, new DateTime(2023, 8, 17, 15, 37, 52, 743, DateTimeKind.Local).AddTicks(6928), null, new DateTime(2023, 8, 17, 15, 37, 52, 743, DateTimeKind.Local).AddTicks(6895), new DateTime(2023, 8, 20, 15, 37, 52, 743, DateTimeKind.Local).AddTicks(6926), 1, 1 },
-                    { 2, null, null, new DateTime(2023, 8, 20, 15, 37, 52, 743, DateTimeKind.Local).AddTicks(6932), new DateTime(2023, 8, 22, 15, 37, 52, 743, DateTimeKind.Local).AddTicks(6934), 4, 4 },
-                    { 3, new DateTime(2023, 8, 15, 15, 37, 52, 743, DateTimeKind.Local).AddTicks(6939), null, new DateTime(2023, 8, 14, 15, 37, 52, 743, DateTimeKind.Local).AddTicks(6936), new DateTime(2023, 8, 19, 15, 37, 52, 743, DateTimeKind.Local).AddTicks(6937), 2, 2 },
-                    { 4, null, null, new DateTime(2023, 8, 11, 15, 37, 52, 743, DateTimeKind.Local).AddTicks(6941), new DateTime(2023, 8, 16, 15, 37, 52, 743, DateTimeKind.Local).AddTicks(6942), 3, 3 },
-                    { 5, new DateTime(2023, 8, 13, 15, 37, 52, 743, DateTimeKind.Local).AddTicks(6947), new DateTime(2023, 8, 16, 15, 37, 52, 743, DateTimeKind.Local).AddTicks(6948), new DateTime(2023, 8, 13, 15, 37, 52, 743, DateTimeKind.Local).AddTicks(6944), new DateTime(2023, 8, 16, 15, 37, 52, 743, DateTimeKind.Local).AddTicks(6945), 1, 5 },
-                    { 6, new DateTime(2023, 8, 12, 15, 37, 52, 743, DateTimeKind.Local).AddTicks(6953), new DateTime(2023, 8, 14, 15, 37, 52, 743, DateTimeKind.Local).AddTicks(6954), new DateTime(2023, 8, 11, 15, 37, 52, 743, DateTimeKind.Local).AddTicks(6950), new DateTime(2023, 8, 14, 15, 37, 52, 743, DateTimeKind.Local).AddTicks(6952), 5, 6 },
-                    { 7, new DateTime(2023, 8, 15, 15, 37, 52, 743, DateTimeKind.Local).AddTicks(6959), new DateTime(2023, 8, 16, 15, 37, 52, 743, DateTimeKind.Local).AddTicks(6960), new DateTime(2023, 8, 14, 15, 37, 52, 743, DateTimeKind.Local).AddTicks(6956), new DateTime(2023, 8, 16, 15, 37, 52, 743, DateTimeKind.Local).AddTicks(6957), 5, 7 }
+                    { 1, new DateTime(2023, 8, 18, 20, 32, 20, 315, DateTimeKind.Local).AddTicks(8032), null, new DateTime(2023, 8, 18, 20, 32, 20, 315, DateTimeKind.Local).AddTicks(7995), new DateTime(2023, 8, 21, 20, 32, 20, 315, DateTimeKind.Local).AddTicks(8028), 1, 1 },
+                    { 2, null, null, new DateTime(2023, 8, 21, 20, 32, 20, 315, DateTimeKind.Local).AddTicks(8037), new DateTime(2023, 8, 23, 20, 32, 20, 315, DateTimeKind.Local).AddTicks(8039), 4, 4 },
+                    { 3, new DateTime(2023, 8, 16, 20, 32, 20, 315, DateTimeKind.Local).AddTicks(8044), null, new DateTime(2023, 8, 15, 20, 32, 20, 315, DateTimeKind.Local).AddTicks(8041), new DateTime(2023, 8, 20, 20, 32, 20, 315, DateTimeKind.Local).AddTicks(8043), 2, 2 },
+                    { 4, null, null, new DateTime(2023, 8, 12, 20, 32, 20, 315, DateTimeKind.Local).AddTicks(8051), new DateTime(2023, 8, 17, 20, 32, 20, 315, DateTimeKind.Local).AddTicks(8053), 3, 3 },
+                    { 5, new DateTime(2023, 8, 14, 20, 32, 20, 315, DateTimeKind.Local).AddTicks(8059), new DateTime(2023, 8, 17, 20, 32, 20, 315, DateTimeKind.Local).AddTicks(8060), new DateTime(2023, 8, 14, 20, 32, 20, 315, DateTimeKind.Local).AddTicks(8055), new DateTime(2023, 8, 17, 20, 32, 20, 315, DateTimeKind.Local).AddTicks(8057), 1, 5 },
+                    { 6, new DateTime(2023, 8, 13, 20, 32, 20, 315, DateTimeKind.Local).AddTicks(8067), new DateTime(2023, 8, 15, 20, 32, 20, 315, DateTimeKind.Local).AddTicks(8069), new DateTime(2023, 8, 12, 20, 32, 20, 315, DateTimeKind.Local).AddTicks(8063), new DateTime(2023, 8, 15, 20, 32, 20, 315, DateTimeKind.Local).AddTicks(8065), 5, 6 },
+                    { 7, new DateTime(2023, 8, 16, 20, 32, 20, 315, DateTimeKind.Local).AddTicks(8075), new DateTime(2023, 8, 17, 20, 32, 20, 315, DateTimeKind.Local).AddTicks(8077), new DateTime(2023, 8, 15, 20, 32, 20, 315, DateTimeKind.Local).AddTicks(8071), new DateTime(2023, 8, 17, 20, 32, 20, 315, DateTimeKind.Local).AddTicks(8072), 5, 7 }
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Packages_ContainerId",
+                table: "Packages",
+                column: "ContainerId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Packages_CustomerId",
@@ -304,10 +315,10 @@ namespace Warehouse.API.Migrations
                 name: "Packages");
 
             migrationBuilder.DropTable(
-                name: "Containers");
+                name: "Supplier");
 
             migrationBuilder.DropTable(
-                name: "Supplier");
+                name: "Containers");
 
             migrationBuilder.DropTable(
                 name: "Customer");
