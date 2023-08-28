@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿
 using AutoMapper;
-using Microsoft.AspNetCore.Http;
+
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis;
-using Microsoft.EntityFrameworkCore;
-using Warehouse.API.DbContexts;
-using Warehouse.API.Entities;
-using Warehouse.API.Models;
-using Warehouse.API.Services;
+using Warehouse.Application.Models;
+using Warehouse.Application.Services;
+using Warehouse.Domain.Entities;
 
 namespace Warehouse.API.Controllers
 {
@@ -19,55 +13,57 @@ namespace Warehouse.API.Controllers
     public class CustomersController : ControllerBase
     {
 
-        private readonly CustomerRepository _customerRepository;
+        private readonly ICustomerService _customerService;
 
         private readonly IMapper _mapper;
-        public CustomersController(IMapper mapper,CustomerRepository customerRepository)
+        public CustomersController(IMapper mapper, ICustomerService customerService)
         {
-            _customerRepository = customerRepository;
+            _customerService = customerService;
             _mapper = mapper;
 
         }
 
         [HttpGet("{customerId}/packages")]
-        public async Task<ActionResult<IEnumerable<Package>>> GetCustomerPackages(int customerId)
+        public async Task<ActionResult<IEnumerable<PackageForCustomerDto>>> GetCustomerPackages(int customerId)
         {
-            
-            if (!  _customerRepository.CustomerExists(customerId))
+            try
             {
-                return NotFound();
+
+                return Ok(await _customerService.GetCustomerPackagesAsync(customerId));
             }
-            var customerPackages = await _customerRepository
-                .GetCustomerPackagesAsync(customerId);
-
-
-            return Ok(_mapper.Map <IEnumerable<PackageForCustomerDto>> (customerPackages));
+            catch (Exception ex)
+            {
+                return NotFound($"Customer with ID {customerId} not found.");
+            }
+            
         }
 
         // GET: api/Customers
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Customer>>> GetCustomers()
+        public async Task<ActionResult<IEnumerable<User>>> GetCustomers()
         {
-            var customers = _customerRepository.GetCustomersAsync();
-            if (customers == null)
-            {
+            try {
+                return Ok(await _customerService.GetCustomersAsync());
+
+            }
+            catch (Exception ex) {
                 return NotFound();
             }
-            return Ok(await _customerRepository.GetCustomersAsync());
+       
         }
 
         // GET: api/Customers/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Customer>> GetCustomer(int id)
+        public async Task<ActionResult<User>> GetCustomer(int id)
         {
-            var customer = await _customerRepository.GetCustomerAsync(id);
-
-            if (customer == null)
+            try
             {
-                return NotFound();
+                return await _customerService.GetCustomerAsync(id);
             }
-
-            return Ok(_mapper.Map<User>(customer));
+            catch (Exception ex)
+            {
+                return NotFound($"Customer with ID {id} not found.");
+            }
         }
 
         // PUT: api/Customers/5
@@ -75,28 +71,29 @@ namespace Warehouse.API.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutCustomer(int id, UserDto customer)
         {
-            if (!_customerRepository.CustomerExists(id))
+            try
             {
-                return NotFound();
-            }
-            var customerToUpdate = await _customerRepository.GetCustomerAsync(id);
-            customerToUpdate.Name =customer.Name;
-           await _customerRepository.UpdateCustomerAsync(customerToUpdate);
+                await _customerService.PutCustomerAsync(id,  customer);
 
-            return NoContent();
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return NotFound($"Customer with ID {id} not found.");
+            }
+
         }
 
         // POST: api/Customers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Customer>> PostCustomer(UserDto customer)
+        public async Task<ActionResult<User>> PostCustomer(UserDto customer)
         {
 
-            var customerToStore = _mapper.Map<Customer>(customer); 
-            await _customerRepository.AddCustomerAsync(customerToStore);
+            var customerToStore = await _customerService.AddCustomerAsync(customer);
             //return  Ok(_mapper.Map<PackageDto>(packageToStore));
             return CreatedAtAction("GetCustomer", new { id = customerToStore.Id }
-            , Ok(_mapper.Map<User>(customerToStore)));
+            , Ok(customerToStore));
 
         }
 

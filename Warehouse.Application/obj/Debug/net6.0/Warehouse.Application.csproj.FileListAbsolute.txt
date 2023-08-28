@@ -1,0 +1,15 @@
+C:\Users\Logitude\source\repos\Warehouse\Warehouse.Application\obj\Debug\net6.0\Warehouse.Application.csproj.AssemblyReference.cache
+C:\Users\Logitude\source\repos\Warehouse\Warehouse.Application\obj\Debug\net6.0\Warehouse.Application.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Logitude\source\repos\Warehouse\Warehouse.Application\obj\Debug\net6.0\Warehouse.Application.AssemblyInfoInputs.cache
+C:\Users\Logitude\source\repos\Warehouse\Warehouse.Application\obj\Debug\net6.0\Warehouse.Application.AssemblyInfo.cs
+C:\Users\Logitude\source\repos\Warehouse\Warehouse.Application\obj\Debug\net6.0\Warehouse.Application.csproj.CoreCompileInputs.cache
+C:\Users\Logitude\source\repos\Warehouse\Warehouse.Application\bin\Debug\net6.0\Warehouse.Application.deps.json
+C:\Users\Logitude\source\repos\Warehouse\Warehouse.Application\bin\Debug\net6.0\Warehouse.Application.dll
+C:\Users\Logitude\source\repos\Warehouse\Warehouse.Application\bin\Debug\net6.0\Warehouse.Application.pdb
+C:\Users\Logitude\source\repos\Warehouse\Warehouse.Application\bin\Debug\net6.0\Warehouse.Domain.dll
+C:\Users\Logitude\source\repos\Warehouse\Warehouse.Application\bin\Debug\net6.0\Warehouse.Domain.pdb
+C:\Users\Logitude\source\repos\Warehouse\Warehouse.Application\obj\Debug\net6.0\Warehouse.Application.csproj.CopyComplete
+C:\Users\Logitude\source\repos\Warehouse\Warehouse.Application\obj\Debug\net6.0\Warehouse.Application.dll
+C:\Users\Logitude\source\repos\Warehouse\Warehouse.Application\obj\Debug\net6.0\refint\Warehouse.Application.dll
+C:\Users\Logitude\source\repos\Warehouse\Warehouse.Application\obj\Debug\net6.0\Warehouse.Application.pdb
+C:\Users\Logitude\source\repos\Warehouse\Warehouse.Application\obj\Debug\net6.0\ref\Warehouse.Application.dll

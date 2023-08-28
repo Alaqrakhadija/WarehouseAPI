@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿
 using AutoMapper;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Warehouse.API.DbContexts;
-using Warehouse.API.Entities;
-using Warehouse.API.Models;
-using Warehouse.API.Services;
+using Warehouse.Application.Exceptions;
+using Warehouse.Application.Models;
+using Warehouse.Application.Services;
 
 namespace Warehouse.API.Controllers
 {
@@ -17,38 +11,36 @@ namespace Warehouse.API.Controllers
     [ApiController]
     public class LocationsController : ControllerBase
     {
-        private readonly LocationRepository _locationRepository;
-        private readonly IMapper _mapper;
-        private readonly ILogger<LocationsController> _logger;
-        public LocationsController( LocationRepository locationRepository, IMapper mapper, ILogger<LocationsController> logger)
+        private readonly ILocationService _locationService;
+
+        public LocationsController(ILocationService locationService)
         {
-            _mapper = mapper;
-            _locationRepository = locationRepository;
-            _logger = logger;
+
+            _locationService = locationService;
+
         }
 
         // GET: api/Locations
         [HttpGet]
         public async Task<ActionResult<IEnumerable<LocationDto>>> GetFreeLocations(DateTime filter)
         {
-            var freeLocations = await _locationRepository.GetFreeLocationsByDateAsync(filter);
+            var freeLocations = await _locationService.GetFreeLocations(filter);
 
-            return Ok(_mapper.Map<IEnumerable<LocationDto>>(freeLocations));
+            return Ok(freeLocations);
         }
 
         // GET: api/Locations/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Location>> GetLocation(int id)
+        public async Task<ActionResult<LocationDto>> GetLocation(int id)
         {
-
-            var location = await _locationRepository.GetLocationAsync(id);
-
-            if (location == null)
+            try
             {
-                return NotFound();
-            }
+                var location = await _locationService.GetLocation(id);
 
-            return Ok(_mapper.Map<LocationDto>(location));
+                return Ok(location);
+            }
+            catch (Exception ex) { return NotFound(ex.Message); }
+
         }
 
         // PUT: api/Locations/5
@@ -56,36 +48,34 @@ namespace Warehouse.API.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutLocation(int id, LocationForCreateUpdateDto location)
         {
-            if (!_locationRepository.LocationExists(id))
+            try
             {
-                return NotFound();
+                 await _locationService.PutLocation(id,location);
+
+
+                return NoContent();
+            }
+            catch(BadRequestException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex){
+                return NotFound(ex.Message);
             }
 
-            if (!_locationRepository.ValidDimension(id, location.Dimensions))
-            {
-                return BadRequest("Dimension Not Suitable with current packages");
-            }
-            var locationToUpdate = await _locationRepository.GetLocationAsync(id);
-            locationToUpdate.Dimensions = location.Dimensions;
-            await _locationRepository.UpdateLocationAsync(locationToUpdate);
-
-
-            return NoContent();
         }
 
         // POST: api/Locations
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Location>> PostLocation(LocationForCreateUpdateDto location)
+        public async Task<ActionResult<LocationDto>> PostLocation(LocationForCreateUpdateDto location)
         {
-            var locationToStore = _mapper.Map<Location>(location);
+            var locationToStore =  await _locationService.PostLocation(location);
 
-            await _locationRepository.AddLocationAsync(locationToStore);
-
-            return CreatedAtAction("GetLocation", new { id = locationToStore.Id }, _mapper.Map<LocationDto>(locationToStore));
+            return CreatedAtAction("GetLocation", new { id = locationToStore.Id }, locationToStore);
         }
 
-        //// DELETE: api/Locations/5
+        // DELETE: api/Locations/5
         //[HttpDelete("{id}")]
         //public async Task<IActionResult> DeleteLocation(int id)
         //{

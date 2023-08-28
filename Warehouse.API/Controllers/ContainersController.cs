@@ -1,15 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿
 using AutoMapper;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Warehouse.API.DbContexts;
-using Warehouse.API.Entities;
-using Warehouse.API.Models;
-using Warehouse.API.Services;
+using Warehouse.Application.Models;
+using Warehouse.Application.Services;
 
 namespace Warehouse.API.Controllers
 {
@@ -17,45 +10,38 @@ namespace Warehouse.API.Controllers
     [ApiController]
     public class ContainersController : ControllerBase
     {
-        private readonly WarehouseContext _context;
+        private readonly IContainerService _containerService;
 
-        private readonly ILogger<ContainersController> _logger;
-        private readonly IMapper _mapper;
-        public ContainersController(WarehouseContext context
-            , ILogger<ContainersController> logger,IMapper mapper)
+        public ContainersController(IContainerService containerService
+          )
         {
-            _logger = logger;
-            _context = context;
-            _mapper = mapper;
+
+            _containerService = containerService;
+
         }
 
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ContainerDto>>> GetContainers()
         {
-            if (_context.Containers == null)
-            {
-                return NotFound();
-            }
-            return Ok(_mapper.Map<IEnumerable<ContainerDto>>(await _context.Containers.ToListAsync()));
+
+            return Ok(await _containerService.GetContainers());
         }
 
         // GET: api/Containers/5
         [HttpGet("{id}")]
         public async Task<ActionResult<ContainerDto>> GetContainer(int id)
         {
-            if (_context.Containers == null)
+            try
             {
-                return NotFound();
+                return Ok(await _containerService.GetContainer(id));
             }
-            var container = await _context.Containers.FindAsync(id);
-
-            if (container == null)
+            catch (Exception ex)
             {
-                return NotFound();
+                return NotFound(ex.Message);
             }
 
-            return Ok(_mapper.Map<ContainerDto>(container));
+
         }
 
         // PUT: api/Containers/5
@@ -63,39 +49,31 @@ namespace Warehouse.API.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutContainer(int id, ContainerToCreateUpdateDto container)
         {
-            if (!ContainerExists(id))
-            {
-                return NotFound();
+            try {
+                await _containerService.PutContainer(id, container);
+                return NoContent();
             }
-            var containerToUpdate = await _context.Containers.FindAsync(id);
-            containerToUpdate.Type=container.Type;
-            _context.Entry(containerToUpdate).State = EntityState.Modified;
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
 
 
-            return NoContent();
         }
 
         // POST: api/Containers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Container>> PostContainer(ContainerToCreateUpdateDto container)
+        public async Task<ActionResult<ContainerDto>> PostContainer(ContainerToCreateUpdateDto container)
         {
-            if (_context.Containers == null)
-            {
-                return Problem("Entity set 'WarehouseContext.Containers'  is null.");
-            }
-            var containerToAdd = _mapper.Map<Container>(container);
-            _context.Containers.Add(containerToAdd);
-            await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetContainer", new { id = containerToAdd.Id }, _mapper.Map<ContainerDto>(containerToAdd));
+            var containerToAdd = await _containerService.PostContainer(container);
+
+            return CreatedAtAction("GetContainer", new { id = containerToAdd.Id }, containerToAdd);
         }
 
 
 
-        private bool ContainerExists(int id)
-        {
-            return (_context.Containers?.Any(e => e.Id == id)).GetValueOrDefault();
-        }
+
     }
 }

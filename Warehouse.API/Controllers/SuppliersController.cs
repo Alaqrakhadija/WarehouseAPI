@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Warehouse.API.DbContexts;
-using Warehouse.API.Entities;
-using Warehouse.API.Models;
+using Warehouse.Application.Models;
+using Warehouse.Application.Services;
+using Warehouse.Domain.Entities;
 
 namespace Warehouse.API.Controllers
 {
@@ -16,82 +10,69 @@ namespace Warehouse.API.Controllers
     [ApiController]
     public class SuppliersController : ControllerBase
     {
-        private readonly WarehouseContext _context;
-        private readonly IMapper _mapper;
+        private readonly ISupplierService _supplierService;
 
-        public SuppliersController(WarehouseContext context, IMapper mapper)
+
+        public SuppliersController(ISupplierService supplierService)
         {
-            _context = context;
-            _mapper = mapper;
+            _supplierService = supplierService;
+
         }
 
         // GET: api/Suppliers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<User>>> GetSuppliers()
         {
-          if (_context.Suppliers == null)
-          {
-              return NotFound();
-          }
-            return  Ok(_mapper.Map<IEnumerable<User>>(await _context.Suppliers.ToListAsync()));
+          
+                return Ok(await _supplierService.GetSuppliers());
+           
+      
+
         }
 
         // GET: api/Suppliers/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Supplier>> GetSupplier(int id)
+        public async Task<ActionResult<User>> GetSupplier(int id)
         {
-          if (_context.Suppliers == null)
-          {
-              return NotFound();
-          }
-            var supplier = await _context.Suppliers.FindAsync(id);
-
-            if (supplier == null)
+            try
             {
-                return NotFound();
+                return Ok(await _supplierService.GetSupplier(id));
             }
-
-            return Ok(_mapper.Map<User>(supplier));
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
 
         // PUT: api/Suppliers/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutSupplier(int id, User supplier)
+        public async Task<IActionResult> PutSupplier(int id, UserDto supplier)
         {
-            if (!SupplierExists(id))
+            try
             {
-                return NotFound();
+                await _supplierService.PutSupplier(id, supplier);
+                return NoContent();
             }
-            var supplierToUpdate = await _context.Suppliers.FindAsync(id);
-            supplierToUpdate.Name = supplier.Name;
-            _context.Entry(supplierToUpdate).State = EntityState.Modified;
+            catch (Exception ex){
 
-      
+                return NotFound(ex.Message);
+            }
 
-            return NoContent();
+   
         }
 
         // POST: api/Suppliers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Supplier>> PostSupplier(UserDto supplier)
+        public async Task<ActionResult<UserDto>> PostSupplier(UserDto supplier)
         {
-          if (_context.Suppliers == null)
-          {
-              return Problem("Entity set 'WarehouseContext.Suppliers'  is null.");
-          }
-          var supplierToAdd = _mapper.Map<Supplier>(supplier);
-            _context.Suppliers.Add(supplierToAdd);
-            await _context.SaveChangesAsync();
+            var supplierToAdd = await _supplierService.PostSupplier(supplier);
 
-            return CreatedAtAction("GetSupplier", new { id = supplierToAdd.Id }, _mapper.Map<User>(supplierToAdd));
+            return CreatedAtAction("GetSupplier", new { id = supplierToAdd.Id }, supplierToAdd);
         }
 
 
-        private bool SupplierExists(int id)
-        {
-            return (_context.Suppliers?.Any(e => e.Id == id)).GetValueOrDefault();
-        }
+
     }
 }
